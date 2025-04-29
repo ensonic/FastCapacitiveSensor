@@ -18,18 +18,19 @@ static void sort(double* array) {
         swap(&array[j], &array[j - 1]);
 }
 
-void FastCapacitiveSensor::begin(int send, int receive, double voltage, int frequency, int breakthreshold, double exceptratio) {
+void FastCapacitiveSensor::begin(int send, int receive, double voltage, int frequency, int breakthreshold, double exceptratio, int adcBits) {
   SEND = send;
   RECEIVE = receive;
   VOLTAGE = voltage;
   FREQUENCY = frequency;
   BREAKTHRESHOLD = breakthreshold;
   EXCEPTRATIO = exceptratio;
+  ADCMAX = 1 << adcBits;
 }
 
 double FastCapacitiveSensor::touch() {
   double VAL[FREQUENCY];
-  double INPUTTHRESHOLD = VOLTAGE * 1024 / 5 * 0.9;
+  double INPUTTHRESHOLD = VOLTAGE * ADCMAX / 5 * 0.9;
 
   for (int i = 0; i < FREQUENCY; i++) {
     double val = 0;

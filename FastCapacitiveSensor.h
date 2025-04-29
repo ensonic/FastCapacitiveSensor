@@ -6,7 +6,7 @@
 class FastCapacitiveSensor {
 public:
   FastCapacitiveSensor();
-  void begin(int send, int receive, double voltage, int frequency, int breakthreshold, double exceptratio);
+  void begin(int send, int receive, double voltage, int frequency, int breakthreshold, double exceptratio, int adcBits=10);
   double touch();
 
 private:
@@ -16,6 +16,7 @@ private:
   int SEND;
   int RECEIVE;
   double VOLTAGE;
+  int ADCMAX;
 };
 
 #endif
