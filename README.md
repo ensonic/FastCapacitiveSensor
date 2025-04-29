@@ -22,17 +22,16 @@ Capacitive sensors are pseudo capacitors. Your Arduino will measure the time of 
 
 ### How to sense faster
 
-The equation of the sensed voltage will be:
+The equation of the sensed voltage will be:\
+$$V = V_0(1-e^{-\frac{1}{RC}t})
 $$
-V = V_0(1-e^{-\frac{1}{RC}t})
-$$
+
 In this library, the time when $V=0.9V_0$ in units of micro seconds will return.
 
 Actually, we do not have to measure the time until $V$ gets $0.9V_0$. When the time is $t_1$, this library quit timing and sense the voltage $V_1$.
 
-The expected returning time $t_{pre}$ will calculated:
-$$
-t_{pre} = \frac{\log(1 - 0.9)}{\log(1 - \frac{V_1}{V_0})}t_1
+The expected returning time $t_{pre}$ will calculated:\
+$$t_{pre} = \frac{\log(1 - 0.9)}{\log(1 - \frac{V_1}{V_0})}t_1
 $$
 
 ## Usage
