@@ -18,32 +18,30 @@ static void sort(double* array) {
         swap(&array[j], &array[j - 1]);
 }
 
-void FastCapacitiveSensor::begin(int send, int receive, double voltage, int frequency, int breakthreshold, double exceptratio, int adcBits) {
+void FastCapacitiveSensor::begin(int send, int receive, int frequency, int breakthreshold, double exceptratio, int adcBits) {
   SEND = send;
   RECEIVE = receive;
-  VOLTAGE = voltage;
   FREQUENCY = frequency;
   BREAKTHRESHOLD = breakthreshold;
   EXCEPTRATIO = exceptratio;
   ADCMAX = 1 << adcBits;
+  INPUTTHRESHOLD = ADCMAX * 0.9;
+  EXCEPT = FREQUENCY * EXCEPTRATIO;
+  USE = FREQUENCY - 2 * EXCEPT;
 }
 
 double FastCapacitiveSensor::touch() {
   double VAL[FREQUENCY];
-  double INPUTTHRESHOLD = VOLTAGE * ADCMAX / 5 * 0.9;
 
   for (int i = 0; i < FREQUENCY; i++) {
     double val = 0;
-    unsigned long starttim;
     digitalWrite(SEND, HIGH);
-    starttim = micros();
+    unsigned long starttim = micros();
     while (analogRead(RECEIVE) < INPUTTHRESHOLD) {
-      val = micros() - starttim;
-      if (val > BREAKTHRESHOLD) {
-        int tim = micros() - starttim;
-        int vol = analogRead(RECEIVE);
-        double gamma = -log(1 - vol / (INPUTTHRESHOLD / 0.9)) / tim;
-        val = -log(1 - 0.9) / gamma;
+      unsigned long t1 = micros() - starttim;
+      if (t1 > BREAKTHRESHOLD) {
+        int v1 = analogRead(RECEIVE);
+        val = t1 * log(1.0 - 0.9) / log(1.0 - ((double)v1 / (double)ADCMAX));
         break;
       }
     }
@@ -57,9 +55,7 @@ double FastCapacitiveSensor::touch() {
   }
   sort(VAL);
   double VALsum = 0;
-  int except = FREQUENCY * EXCEPTRATIO;
-  for (int i = except;i < FREQUENCY - except;i++)
+  for (int i = EXCEPT;i < FREQUENCY - EXCEPT;i++)
     VALsum += VAL[i];
-  int dev = FREQUENCY - 2 * except;
-  return VALsum / dev;
+  return VALsum / USE;
 }
