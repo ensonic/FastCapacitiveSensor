@@ -53,7 +53,9 @@ double FastCapacitiveSensor::touch() {
     } else
       i--;
   }
-  sort(VAL);
+  if (EXCEPT > 0) {
+    sort(VAL);
+  }
   double VALsum = 0;
   for (int i = EXCEPT;i < FREQUENCY - EXCEPT;i++)
     VALsum += VAL[i];
