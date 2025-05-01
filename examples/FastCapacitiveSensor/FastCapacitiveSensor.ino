@@ -1,15 +1,13 @@
 #include <FastCapacitiveSensor.h>
-FastCapacitiveSensor sensor1;
-FastCapacitiveSensor sensor2;
+// the send pin should be a pin that can be used with the digitalWrite() function
+// the receive pin MUST be an analog pin. The library uses analogRead() internally.
+FastCapacitiveSensor sensor1(A0, A1, 10, 10, 0.2);
+FastCapacitiveSensor sensor2(A2, A3, 10, 10, 0.2);
 
 void setup() {
-  pinMode(A0, OUTPUT); // the send pin should be a pin that can be used with the digitalWrite() function
-  pinMode(A1, INPUT);  // the receive pin MUST be an analog pin. The library uses analogRead() internally.
-  pinMode(A2, OUTPUT);
-  pinMode(A3, INPUT);
   Serial.begin(9600);
-  sensor1.begin(A0, A1, 5.0, 10, 10, 0.2);
-  sensor2.begin(A2, A3, 5.0, 10, 10, 0.2);
+  sensor1.begin();
+  sensor2.begin();
 }
 
 void loop() {
