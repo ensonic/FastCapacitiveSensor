@@ -1,7 +1,11 @@
 #include "FastCapacitiveSensor.h"
 #include <math.h>
 
-FastCapacitiveSensor::FastCapacitiveSensor() {
+FastCapacitiveSensor::FastCapacitiveSensor(int sendPin, int receivePin, int frequency, int breakThreshold, double exceptRatio, int adcBits) : sendPin(sendPin), receivePin(receivePin), numReads(frequency), breakThreshold(breakThreshold), exceptRatio(exceptRatio)  {
+  adcmax = 1 << adcBits;
+  inputThreshold = adcmax * 0.9;
+  except = frequency * exceptRatio;
+  use = frequency - 2 * except;
 }
 
 static void swap(double* a, double* b) {
@@ -18,46 +22,39 @@ static void sort(double* array) {
         swap(&array[j], &array[j - 1]);
 }
 
-void FastCapacitiveSensor::begin(int send, int receive, int frequency, int breakthreshold, double exceptratio, int adcBits) {
-  SEND = send;
-  RECEIVE = receive;
-  FREQUENCY = frequency;
-  BREAKTHRESHOLD = breakthreshold;
-  EXCEPTRATIO = exceptratio;
-  ADCMAX = 1 << adcBits;
-  INPUTTHRESHOLD = ADCMAX * 0.9;
-  EXCEPT = FREQUENCY * EXCEPTRATIO;
-  USE = FREQUENCY - 2 * EXCEPT;
+void FastCapacitiveSensor::begin() {
+  pinMode(sendPin, OUTPUT_OPENDRAIN);
+  pinMode(receivePin, INPUT);
 }
 
 double FastCapacitiveSensor::touch() {
-  double VAL[FREQUENCY];
+  double values[numReads];
 
-  for (int i = 0; i < FREQUENCY; i++) {
+  for (int i = 0; i < numReads; i++) {
     double val = 0;
-    digitalWrite(SEND, HIGH);
+    digitalWrite(sendPin, HIGH);
     unsigned long starttim = micros();
-    while (analogRead(RECEIVE) < INPUTTHRESHOLD) {
+    while (analogRead(receivePin) < inputThreshold) {
       unsigned long t1 = micros() - starttim;
-      if (t1 > BREAKTHRESHOLD) {
-        int v1 = analogRead(RECEIVE);
-        val = t1 * log(1.0 - 0.9) / log(1.0 - ((double)v1 / (double)ADCMAX));
+      if (t1 > breakThreshold) {
+        int v1 = analogRead(receivePin);
+        val = t1 * log(1.0 - 0.9) / log(1.0 - ((double)v1 / (double)adcmax));
         break;
       }
     }
-    digitalWrite(SEND, LOW);
+    digitalWrite(sendPin, LOW);
     delayMicroseconds(10);
 
     if (val > 0) {
-      VAL[i] = val;
+      values[i] = val;
     } else
       i--;
   }
-  if (EXCEPT > 0) {
-    sort(VAL);
+  if (except > 0) {
+    sort(values);
   }
-  double VALsum = 0;
-  for (int i = EXCEPT;i < FREQUENCY - EXCEPT;i++)
-    VALsum += VAL[i];
-  return VALsum / USE;
+  double sum = 0;
+  for (int i = except;i < numReads - except;i++)
+    sum += values[i];
+  return sum / use;
 }

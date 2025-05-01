@@ -45,36 +45,36 @@ See also example program.
 #include <FastCapacitiveSensor.h>
 ```
 
-### Define a class
+### Define an instance
 
 ```c++
-FastCapacitiveSensor sensor1;
-```
-
-### Execute begin function
-
-```c++
-sensor1.begin(A0, A1, 5.0, 10, 10, 0.2);
+FastCapacitiveSensor sensor1(A0, A1, 10, 10, 0.2);
 ```
 
 arguments:
 
 ```c++
-void begin(sendPin, receivePin, maxVoltage, frequency, breakThreshold, excludeRatio, adcBits);
+void begin(sendPin, receivePin, numReads, breakThreshold, excludeRatio, adcBits);
 ```
 sendPin is a pin that you can use the function digitalWrite on.
 
 receivePin is read out with analogRead, so it should be an analog pin.
 
-maxVoltage is the voltage of the sendPin. It is $V_0$.
-
-frequency is how many times the touch function tries sensing.
+numReads is how many times the touch function tries sensing.
 
 breakThreshold is the threshold of breaking sensing. The unit is micro seconds. the touch function finish sensing on the breakThreshold time, and after that, calculate the expected time of sensing. It is $t_1$.
 
 excludeRatio is the ratio of exclusion of sensed values. Must be larger than or the same as 0 and smaller than 0.5.
 
 adcBits is the bit-depth of the analog-digital converter. It is by default 10, but some miccontrollers suport higher bit-depths via analogReadResolution().
+
+### Execute begin function
+
+```c++
+sensor1.begin();
+```
+
+This will configure the pin-modes.
 
 ### Sense
 

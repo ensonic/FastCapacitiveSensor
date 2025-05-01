@@ -5,19 +5,18 @@
 
 class FastCapacitiveSensor {
 public:
-  FastCapacitiveSensor();
-  void begin(int send, int receive, int frequency, int breakthreshold, double exceptratio, int adcBits=10);
+  FastCapacitiveSensor(int sendPin, int receivePin, int numReads, int breakThreshold, double exceptRatio, int adcBits=10);
+  void begin();
   double touch();
 
 private:
-  int FREQUENCY;
-  int BREAKTHRESHOLD;
-  double EXCEPTRATIO;
-  int SEND;
-  int RECEIVE;
-  int ADCMAX;
-  double INPUTTHRESHOLD;
-  int EXCEPT, USE;
+  int numReads;
+  int breakThreshold;
+  double exceptRatio;
+  int sendPin, receivePin;
+  int adcmax;
+  double inputThreshold;
+  int except, use;
 };
 
 #endif
