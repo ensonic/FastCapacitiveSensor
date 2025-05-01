@@ -37,6 +37,7 @@ unsigned long FastCapacitiveSensor::touch() {
     while (analogRead(receivePin) < inputThreshold) {
       unsigned long t1 = micros() - starttim;
       if (t1 > breakThreshold) {
+         // for some reason it works better if we do anther read here
         int v1 = analogRead(receivePin);
         val = t1 * logf(1.0 - 0.9) / logf(1.0 - ((float)v1 / (float)adcmax));
         break;
