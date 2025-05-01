@@ -82,4 +82,4 @@ This will configure the pin-modes.
 sensor1.touch()
 ```
 
-The return value is the sensed (or calculated) time in units of micro seconds. The type is double.
+The return value is the sensed (or calculated) time in units of micro seconds. The type is `unsigned long`.

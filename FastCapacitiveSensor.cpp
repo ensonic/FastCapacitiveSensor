@@ -1,21 +1,21 @@
 #include "FastCapacitiveSensor.h"
 #include <math.h>
 
-FastCapacitiveSensor::FastCapacitiveSensor(int sendPin, int receivePin, int frequency, int breakThreshold, double exceptRatio, int adcBits) : sendPin(sendPin), receivePin(receivePin), numReads(frequency), breakThreshold(breakThreshold), exceptRatio(exceptRatio)  {
+FastCapacitiveSensor::FastCapacitiveSensor(int sendPin, int receivePin, int frequency, int breakThreshold, float exceptRatio, int adcBits) : sendPin(sendPin), receivePin(receivePin), numReads(frequency), breakThreshold(breakThreshold), exceptRatio(exceptRatio)  {
   adcmax = 1 << adcBits;
   inputThreshold = adcmax * 0.9;
   except = frequency * exceptRatio;
   use = frequency - 2 * except;
 }
 
-static void swap(double* a, double* b) {
-  double c = *a;
+static void swap(float* a, float* b) {
+  float c = *a;
   *a = *b;
   *b = c;
 }
 
-static void sort(double* array) {
-  int size = sizeof(array) / sizeof(double);
+static void sort(float* array) {
+  int size = sizeof(array) / sizeof(float);
   for(int i = 0;i < size;i++)
     for(int j = size - 1;j > i; j--)
       if(array[j] < array[j - 1])
@@ -27,18 +27,18 @@ void FastCapacitiveSensor::begin() {
   pinMode(receivePin, INPUT);
 }
 
-double FastCapacitiveSensor::touch() {
-  double values[numReads];
+unsigned long FastCapacitiveSensor::touch() {
+  float values[numReads];
 
   for (int i = 0; i < numReads; i++) {
-    double val = 0;
+    float val = 0;
     digitalWrite(sendPin, HIGH);
     unsigned long starttim = micros();
     while (analogRead(receivePin) < inputThreshold) {
       unsigned long t1 = micros() - starttim;
       if (t1 > breakThreshold) {
         int v1 = analogRead(receivePin);
-        val = t1 * log(1.0 - 0.9) / log(1.0 - ((double)v1 / (double)adcmax));
+        val = t1 * logf(1.0 - 0.9) / logf(1.0 - ((float)v1 / (float)adcmax));
         break;
       }
     }
@@ -53,8 +53,8 @@ double FastCapacitiveSensor::touch() {
   if (except > 0) {
     sort(values);
   }
-  double sum = 0;
+  float sum = 0;
   for (int i = except;i < numReads - except;i++)
     sum += values[i];
-  return sum / use;
+  return (unsigned long)(sum / use);
 }
